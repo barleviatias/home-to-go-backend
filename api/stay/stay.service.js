@@ -11,12 +11,14 @@ module.exports = {
 	update,
 	add,
 };
-
-async function query(filterBy = { searchTxt: '', guests: '1' ,type:'all' }) {
-	const criteria = _buildCriteria(filterBy);
+async function query(filterBy = { address: '', guests: 1 }) {
+	const criteria = _buildCriteria({...filterBy});
 	try {
 		const collection = await dbService.getCollection('stay');
 		var stays = await collection.find(criteria).toArray();
+		// var stays = await collection.find({'loc.address': "Porto, Portugal"}).toArray();
+		console.log('criteria', criteria);
+		// console.log(stays);
 
 		return stays;
 	} catch (err) {
@@ -121,19 +123,17 @@ async function add(stay) {
 }
 
 function _buildCriteria(filterBy) {
-	const criteria = {};
+	let criteria = {};
+	console.log('filter by i crite', filterBy);
+	// const regex = new RegExp(filterBy.address, 'i')
 
-	const txtCriteria = { $regex: filterBy.searchTxt, $options: 'i' };
-    // if (filterBy.type === 'host') {
-	// 	criteria.type = filterBy.type;
-	// } else if (filterBy.type === 'user') {
-	// 	criteria.type = filterBy.type;
-	// }
-	if (filterBy.searchTxt && filterBy.searchTxt !== '') {
-		criteria.name = txtCriteria;
-	}
-	if (filterBy.guests && filterBy.guests !== 1) {
-		criteria.guests = filterBy.guests;
+	const txtCriteria = { $regex: filterBy.address, $options: 'i' };
+	
+        if (filterBy.address && filterBy.address !== '') {
+            criteria= {'loc.address':txtCriteria};
+        }
+        if (filterBy.guests) {
+            criteria.capacity = { $gte: filterBy.guests };
 	}
 	return criteria;
 }
