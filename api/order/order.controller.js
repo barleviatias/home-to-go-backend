@@ -6,6 +6,7 @@ const orderService = require('../order/order.service')
 
 async function getOrders(req, res) {
     try {
+        
         const orders = await orderService.query(req.query)
         res.send(orders)
     } catch (err) {

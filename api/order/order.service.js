@@ -5,7 +5,6 @@ const asyncLocalStorage = require('../../services/als.service')
 async function query(user) {
     try {
         const criteria = _buildCriteria(user)
-        console.log('user from query service', user);
         const collection = await dbService.getCollection('order')
         return await collection.find(criteria).toArray()     
     } catch (err) {
@@ -61,59 +60,10 @@ async function add(order) {
         throw err
     }
 }
-function _buildCriteria(filterBy) {
-    const criteria = {}
 
-    // const txtCriteria = { $regex: filterBy.searchTxt, $options: 'i' }
-
-    // if (filterBy.searchTxt && filterBy.searchTxt !== '') {
-    //     criteria.name = txtCriteria
-    // }
-
-    if (filterBy.type === 'host') {        
-            criteria.hostId = filterBy.hostId       
-    }
-    else if(filterBy.type === 'user'){
-            criteria.userId = filterBy.userId
-    }
-    
-    return criteria
-}
-// function _buildCriteria(filterBy) {
-//     const criteria = {}
-//     return criteria
-// }
 
 module.exports = {
     query,
     remove,
     add
 }
-
-
-
-// async function query(filterBy = {}) {
-//     try {
-//         // const criteria = _buildCriteria(filterBy)
-//         const collection = await dbService.getCollection('order')
-//         // const reviews = await collection.find(criteria).toArray()
-//         // var reviews = await collection.aggregate().toArray()
-//         reviews = reviews.map(review => {
-//             review.user = { _id: review.user._id, fullname: review.user.fullname }
-//             review.toy = { _id: review.toy._id, name: review.toy.name }
-//             delete review.userId
-//             delete review.toyId
-//             return review
-//         })
-
-//         return reviews
-//     } catch (err) {
-//         // logger.error('cannot find reviews', err)
-//         throw err
-//     }
-
-// }
-
-// function _buildCriteria(){
-//     const criteria ={}
-// }
