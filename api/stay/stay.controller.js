@@ -4,17 +4,16 @@ const logger = require('../../services/logger.service')
 
 
 async function getStays(req, res) {
-    // const filterBy = {}
-    // const { searchTxt, availability, sortBy, type } = req.query
+    const filterBy = {}
+    const { searchTxt, guests ,type } = req.query
     
     try {
-        // filterBy.searchTxt = searchTxt || ''
-        // filterBy.availability = availability
-        // filterBy.sortBy = sortBy
-        // filterBy.type = type
+        filterBy.searchTxt = searchTxt || ''
+        filterBy.guests = guests
+        filterBy.type = type
     
-        // const stays = await stayService.query(filterBy)
-        const stays = await stayService.query()
+        const stays = await stayService.query(filterBy)
+        // const stays = await stayService.query()
         res.send(stays)
     } catch (err) {
         logger.error('Failed to get stays', err)

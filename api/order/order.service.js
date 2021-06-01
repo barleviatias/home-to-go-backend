@@ -2,11 +2,11 @@ const dbService = require('../../services/db.service')
 const ObjectId = require('mongodb').ObjectId
 const asyncLocalStorage = require('../../services/als.service')
 
-async function query() {
+async function query(filterBy={}) {
     try {
-        // const criteria = _buildCriteria(filterBy)
+        const criteria = _buildCriteria(filterBy)
         const collection = await dbService.getCollection('order')
-        return await collection.find().toArray()            
+        return await collection.find(criteria).toArray()            
     } catch (err) {
         logger.error('cannot load orders', err)
         throw err
@@ -49,11 +49,28 @@ async function add(order) {
         await collection.insertOne(orderToAdd)
         return orderToAdd;
     } catch (err) {
-        // logger.error('cannot insert review', err)
+        logger.error('cannot insert order', err)
         throw err
     }
 }
+function _buildCriteria(filterBy) {
+    const criteria = {}
 
+    // const txtCriteria = { $regex: filterBy.searchTxt, $options: 'i' }
+
+    // if (filterBy.searchTxt && filterBy.searchTxt !== '') {
+    //     criteria.name = txtCriteria
+    // }
+
+    if (filterBy.type === 'host') {        
+            criteria.hostId = filterBy.hostId       
+    }
+    else if(filterBy.type === 'user'){
+            criteria.userId = filterBy.userId
+    }
+    
+    return criteria
+}
 // function _buildCriteria(filterBy) {
 //     const criteria = {}
 //     return criteria
