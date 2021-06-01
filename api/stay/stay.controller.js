@@ -4,8 +4,12 @@ const logger = require('../../services/logger.service');
 
 async function getStays(req, res) {
 	const filterBy = {};
-
-	console.log('req.query : ', typeof (req.query));
+	if(req.query.type==='wishlist'){
+		var {user}=req.query;
+		user = JSON.parse(user)
+		filterBy.user=user
+		filterBy.type='wishlist'
+	}
 	var { loc, guests } = req.query
 	var location = loc
 	var guestsNum = guests
@@ -18,7 +22,7 @@ async function getStays(req, res) {
 	if (!location || !guestsNum) return
 	filterBy.address = location.address
 	filterBy.guests = guestsNum.adults + guestsNum.kids
-	
+
 	try {
 		const stays = await stayService.query(filterBy);
 		res.send(stays);
@@ -27,6 +31,7 @@ async function getStays(req, res) {
 		res.status(500).send({ err: 'Failed to get stays' });
 	}
 }
+
 
 async function getStay(req, res) {
 	try {
@@ -51,7 +56,6 @@ async function deleteStay(req, res) {
 async function updateStay(req, res) {
 	try {
 		const stay = req.body;
-		console.log('update stay from controller');
 		const updatedStay = await stayService.update(stay);
 		res.send(updatedStay);
 		// socketService.broadcast({ type: 'stayy-updated', data: stay, to: updatedToy._id })

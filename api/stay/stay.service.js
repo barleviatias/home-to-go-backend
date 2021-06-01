@@ -11,15 +11,14 @@ module.exports = {
 	update,
 	add,
 };
-async function query(filterBy = { address: '', guests: 1 }) {
-	const criteria = _buildCriteria({...filterBy});
+
+async function query(filterBy = { address: '', guests: 1, type: '' }) {
+	
+	const criteria = _buildCriteria({ ...filterBy });
 	try {
 		const collection = await dbService.getCollection('stay');
 		var stays = await collection.find(criteria).toArray();
 		// var stays = await collection.find({'loc.address': "Porto, Portugal"}).toArray();
-		console.log('criteria', criteria);
-		// console.log('stays: ' , stays);
-
 		return stays;
 	} catch (err) {
 		logger.error('cannot find stays', err);
@@ -124,18 +123,16 @@ async function add(stay) {
 
 function _buildCriteria(filterBy) {
 	let criteria = {};
-	console.log('filter by i crite', filterBy);
 	// const regex = new RegExp(filterBy.address, 'i')
 
 	const txtCriteria = { $regex: filterBy.address, $options: 'i' };
-	
-        if (filterBy.address && filterBy.address !== '') {
-            criteria= {'loc.address':txtCriteria};
-        }
-        if (filterBy.guests) {
-            criteria.capacity = { $gte: filterBy.guests };
+
+	if (filterBy.address && filterBy.address !== '') {
+		criteria = { 'loc.address': txtCriteria };
 	}
-	console.log('criteria: ' , criteria);
+	if (filterBy.guests) {
+		criteria.capacity = { $gte: filterBy.guests };
+	}
 	return criteria;
 }
 
