@@ -18,7 +18,7 @@ async function query(filterBy = { address: '', guests: 1 }) {
 		var stays = await collection.find(criteria).toArray();
 		// var stays = await collection.find({'loc.address': "Porto, Portugal"}).toArray();
 		console.log('criteria', criteria);
-		// console.log(stays);
+		// console.log('stays: ' , stays);
 
 		return stays;
 	} catch (err) {
@@ -135,6 +135,7 @@ function _buildCriteria(filterBy) {
         if (filterBy.guests) {
             criteria.capacity = { $gte: filterBy.guests };
 	}
+	console.log('criteria: ' , criteria);
 	return criteria;
 }
 

@@ -2,22 +2,24 @@ const stayService = require('./stay.service');
 const socketService = require('../../services/socket.service');
 const logger = require('../../services/logger.service');
 
-
 async function getStays(req, res) {
-	let filterBy = {};
-    console.log('req.query:' , req.query);
-	if (!req.query) {
-		var loc = { address: '' };
-		var guests = 1;
-	} else {
-		var { loc, guests } = req.query;
-        loc = JSON.parse(loc);
-        guests = JSON.parse(guests);
-	}
+	const filterBy = {};
 
+	console.log('req.query : ', typeof (req.query));
+	var { loc, guests } = req.query
+	var location = loc
+	var guestsNum = guests
+	if (typeof (loc) === 'string') {
+		location = JSON.parse(loc)
+	}
+	if (typeof (guests) === 'string') {
+		guestsNum = JSON.parse(guests)
+	}
+	if (!location || !guestsNum) return
+	filterBy.address = location.address
+	filterBy.guests = guestsNum.adults + guestsNum.kids
+	
 	try {
-		filterBy.address = loc.address;
-		filterBy.guests = guests;
 		const stays = await stayService.query(filterBy);
 		res.send(stays);
 	} catch (err) {
