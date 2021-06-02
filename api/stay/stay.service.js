@@ -105,7 +105,7 @@ async function add(stay) {
 			desc: stay.desc,
 			capacity: stay.capacity,
 			favorites: [],
-			host: stay.host,
+			host:{...stay.host ,_id:ObjectId(stay.host._id)} ,
 			loc: stay.loc,
 			propertyType: stay.propertyType,
 			stayType: stay.stayType,
@@ -157,8 +157,36 @@ async function getWishStays(user) {
 }
 
 async function getHostStays(host) {
-	console.log('host from servicve', host);
+	try {
+		const collection = await dbService.getCollection('stay');
+		const id = new ObjectId(host)
+		var stays = await collection.find({ 'host._id': id }).toArray();
+		return stays;
+	} catch (err) {
+		logger.error('cannot find stays', err);
+		throw err;
+	}
 }
+
+// async function query(user) {
+//     try {
+//         const criteria = _buildCriteria(user)
+//         const collection = await dbService.getCollection('order')
+//         return await collection.find(criteria).toArray()     
+//     } catch (err) {
+//         logger.error('cannot load orders', err)
+//         throw err
+//     }
+
+// }
+
+// function _buildCriteria({ id, type }) {
+//     let criteria = {}
+//     if (type === 'user') criteria = { 'user._id': id }
+//     else criteria = { 'host._id': id }
+//     return criteria
+// }
+
 
 
 

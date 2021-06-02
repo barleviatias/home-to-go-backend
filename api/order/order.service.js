@@ -6,7 +6,7 @@ async function query(user) {
     try {
         const criteria = _buildCriteria(user)
         const collection = await dbService.getCollection('order')
-        return await collection.find(criteria).toArray()     
+        return await collection.find(criteria).toArray()
     } catch (err) {
         logger.error('cannot load orders', err)
         throw err
