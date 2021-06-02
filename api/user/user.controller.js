@@ -35,7 +35,6 @@ async function deleteUser(req, res) {
 async function updateUser(req, res) {
     try {
         const user = req.body
-        console.log('updateUser function from controller', user);
         const savedUser = await userService.update(user)
         res.send(savedUser)
         // socketService.broadcast({ type: 'user-updated', data: review, to: savedUser._id })

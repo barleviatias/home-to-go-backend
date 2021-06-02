@@ -10,10 +10,12 @@ module.exports = {
 	remove,
 	update,
 	add,
+	getWishStays,
+	getHostStays
 };
 
 async function query(filterBy = { address: '', guests: 1, type: '' }) {
-	
+
 	const criteria = _buildCriteria({ ...filterBy });
 	try {
 		const collection = await dbService.getCollection('stay');
@@ -135,6 +137,95 @@ function _buildCriteria(filterBy) {
 	}
 	return criteria;
 }
+
+
+async function getWishStays(user) {
+	var list = user.wishlist;
+	try {
+		const collection = await dbService.getCollection('stay');
+
+		var ids = [];
+		list.forEach(function (item) {
+			ids.push(new ObjectId(item));
+		});
+		var stays = await collection.find({ _id: { $in: ids } }).toArray();
+		return stays;
+	} catch (err) {
+		logger.error('cannot find stays', err);
+		throw err;
+	}
+}
+
+async function getHostStays(host) {
+	console.log('host from servicve', host);
+}
+
+
+
+
+// async function query1(filterBy = {}) {
+			// filterBy=user
+//     try {
+//         // const criteria = _buildCriteria(filterBy)
+//         const collection = await dbService.getCollection('stay')
+//         // const reviews = await collection.find(criteria).toArray()
+//         var reviews = await collection.aggregate([
+//             {
+//                 $match: filterBy
+//             },
+//             {
+//                 $lookup:
+//                 {
+//                     localField: 'byUserId',
+//                     from: 'user',
+//                     foreignField: '_id',
+//                     as: 'byUser'
+//                 }
+//             },
+//             {
+//                 $unwind: '$byUser'
+//             },
+//             {
+//                 $lookup:
+//                 {
+//                     localField: 'aboutUserId',
+//                     from: 'user',
+//                     foreignField: '_id',
+//                     as: 'aboutUser'
+//                 }
+//             },
+//             {
+//                 $unwind: '$aboutUser'
+//             }
+//         ]).toArray()
+//         reviews = reviews.map(review => {
+//             review.byUser = { _id: review.byUser._id, fullname: review.byUser.fullname }
+//             review.aboutUser = { _id: review.aboutUser._id, fullname: review.aboutUser.fullname }
+//             delete review.byUserId
+//             delete review.aboutUserId
+//             return review
+//         })
+
+//         return reviews
+//     } catch (err) {
+//         logger.error('cannot find reviews', err)
+//         throw err
+//     }
+
+// }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // async function query(filterBy = { availability: 'all', searchTxt: '', type: 'all', sortBy: 'all' }) {
 //     const criteria = _buildCriteria({ ...filterBy })

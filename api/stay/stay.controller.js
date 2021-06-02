@@ -4,12 +4,37 @@ const logger = require('../../services/logger.service');
 
 async function getStays(req, res) {
 	const filterBy = {};
-	if(req.query.type==='wishlist'){
-		var {user}=req.query;
-		user = JSON.parse(user)
-		filterBy.user=user
-		filterBy.type='wishlist'
+	if (req.query.type) {
+		// if (req.query.type === 'wishlist') {
+		console.log('type######################', req.query.type);
+		var { user, type } = req.query;
+		try {
+			let stays = []
+			if (type === 'wishlist') {
+				user = JSON.parse(user)
+				stays = await stayService.getWishStays(user);
+			}
+			else if (type === 'host') {
+				stays = await stayService.getHostStays(user);
+			}
+			res.send(stays);
+			// const stays = ()
+			// if (!stays) res.send([]);
+		} catch (err) {
+			logger.error('Failed to get wishe stays', err);
+			res.status(500).send({ err: 'Failed to get get WishStays stays' });
+		}
 	}
+	else if (req.query.type === 'host stays') {
+
+	}
+
+
+
+
+
+
+
 	var { loc, guests } = req.query
 	var location = loc
 	var guestsNum = guests
