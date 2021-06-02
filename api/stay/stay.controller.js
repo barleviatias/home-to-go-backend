@@ -5,24 +5,25 @@ const logger = require('../../services/logger.service');
 async function getStays(req, res) {
 	const filterBy = {};
 	if (req.query.type) {
-		var { user, type } = req.query;
+		var { data, type } = req.query;
 		try {
 			let stays = []
 			if (type === 'wishlist') {
-				user = JSON.parse(user)
-				stays = await stayService.getWishStays(user);
+				data = JSON.parse(data)
+				stays = await stayService.getWishStays(data);
 			}
 			else if (type === 'host') {
-				stays = await stayService.getHostStays(user);
+				stays = await stayService.getHostStays(data);
+			}
+			else{
+				console.log('####### Enter to nearby / top #########');
+				stays = await stayService.getStaysByType(req.query);
 			}
 			res.send(stays);;
 		} catch (err) {
 			logger.error('Failed to get wishe stays', err);
 			res.status(500).send({ err: 'Failed to get get WishStays stays' });
 		}
-	}
-	else if (req.query.type === 'host stays') {
-
 	}
 	var { loc, guests } = req.query
 	var location = loc
@@ -89,6 +90,10 @@ async function addStay(req, res) {
 		logger.error('Failed to add stay', err);
 		res.status(500).send({ err: 'Failed to add stay' });
 	}
+}
+
+async function getTopStays(){
+
 }
 
 module.exports = {
