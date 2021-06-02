@@ -1,5 +1,5 @@
 const dbService = require('../../services/db.service');
-// const logger = require('../../services/logger.service')
+const logger = require('../../services/logger.service')
 // const reviewService = require('../review/review.service')
 const ObjectId = require('mongodb').ObjectId;
 const axios = require('axios');
@@ -7,7 +7,8 @@ const axios = require('axios');
 module.exports = {
 	query,
 	getById,
-	getByStayname,
+	// getByStayname,
+	getStaysByType,
 	remove,
 	update,
 	add,
@@ -21,7 +22,6 @@ async function query(filterBy = { address: '', guests: 1, type: '' }) {
 	try {
 		const collection = await dbService.getCollection('stay');
 		var stays = await collection.find(criteria).toArray();
-		// var stays = await collection.find({'loc.address': "Porto, Portugal"}).toArray();
 		return stays;
 	} catch (err) {
 		logger.error('cannot find stays', err);
@@ -33,25 +33,9 @@ async function getById(stayId) {
 	try {
 		const collection = await dbService.getCollection('stay');
 		const stay = await collection.findOne({ _id: ObjectId(stayId) });
-		// toy.givenReviews = await reviewService.query({ byToyId: ObjectId(toy._id) })
-		// toy.givenReviews = toy.givenReviews.map(review => {
-		//     delete review.byToy
-		//     return review
-		// })
 		return stay;
 	} catch (err) {
 		logger.error(`while finding stay ${stayId}`, err);
-		throw err;
-	}
-}
-
-async function getByStayname(name) {
-	try {
-		const collection = await dbService.getCollection('stay');
-		const stay = await collection.findOne({ name });
-		return stay;
-	} catch (err) {
-		// logger.error(`while finding toy ${toyname}`, err)
 		throw err;
 	}
 }
@@ -61,7 +45,7 @@ async function remove(stayId) {
 		const collection = await dbService.getCollection('stay');
 		await collection.deleteOne({ _id: ObjectId(stayId) });
 	} catch (err) {
-		// logger.error(`cannot remove toy ${toyId}`, err)
+		logger.error(`cannot remove stay ${stayId}`, err)
 		throw err;
 	}
 }
@@ -92,7 +76,7 @@ async function update(stay) {
 		await collection.updateOne({ _id: stayToSave._id }, { $set: stayToSave });
 		return stayToSave;
 	} catch (err) {
-		// logger.error(`cannot update toy ${toy._id}`, err)
+		logger.error(`cannot update stay ${stay._id}`, err)
 		throw err;
 	}
 }
@@ -134,17 +118,14 @@ async function add(stay) {
 		await collection.insertOne(stayToAdd);
 		return stayToAdd;
 	} catch (err) {
-		// logger.error('cannot insert toy', err)
+		logger.error('cannot insert stay', err)
 		throw err;
 	}
 }
 
 function _buildCriteria(filterBy) {
 	let criteria = {};
-	// const regex = new RegExp(filterBy.address, 'i')
-
 	const txtCriteria = { $regex: filterBy.address, $options: 'i' };
-
 	if (filterBy.address && filterBy.address !== '') {
 		criteria = { 'loc.address': txtCriteria };
 	}
@@ -153,7 +134,6 @@ function _buildCriteria(filterBy) {
 	}
 	return criteria;
 }
-
 
 async function getWishStays(user) {
 	var list = user.wishlist;
@@ -172,10 +152,10 @@ async function getWishStays(user) {
 	}
 }
 
-async function getHostStays(host) {
+async function getHostStays(hostId) {
 	try {
 		const collection = await dbService.getCollection('stay');
-		const id = new ObjectId(host)
+		const id = new ObjectId(hostId)
 		var stays = await collection.find({ 'host._id': id }).toArray();
 		return stays;
 	} catch (err) {
@@ -184,122 +164,100 @@ async function getHostStays(host) {
 	}
 }
 
-// async function query(user) {
-//     try {
-//         const criteria = _buildCriteria(user)
-//         const collection = await dbService.getCollection('order')
-//         return await collection.find(criteria).toArray()     
-//     } catch (err) {
-//         logger.error('cannot load orders', err)
-//         throw err
-//     }
+async function getStaysByType(filterBy) {
+	try {
+		const collection = await dbService.getCollection('stay');
+		var stays = await collection.find().toArray();
+		if (stays) {
+			if (filterBy.type === 'top rated') {
+				stays = stays.map((stay) => {
+					stay.avgRate = _getRate(stay);
+					return stay;
+				});
+				stays.sort(function (a, b) {
+					return b.avgRate - a.avgRate;
+				});
+				return stays.slice(0, 4);
+			}
+			else if (filterBy.type === 'nearby') {
+				const { data } = filterBy
+				stays = stays.filter((stay) => {
+					return stay.loc.address.toUpperCase().includes(data.toUpperCase());
+				});
+				return stays.slice(0, 4);
+			}
+		}
+	} catch (err) {
+		logger.error('cannot find stays', err);
+		throw err;
+	}
+}
 
-// }
-
-// function _buildCriteria({ id, type }) {
-//     let criteria = {}
-//     if (type === 'user') criteria = { 'user._id': id }
-//     else criteria = { 'host._id': id }
-//     return criteria
-// }
-
-
+function _getRate(stay) {
+	const rates = stay.reviews.map((review) => review.avgRate);
+	const sum = rates.reduce((acc, rate) => {
+		acc += rate;
+		return acc;
+	}, 0);
+	return sum / rates.length;
+}
 
 
 
-// async function query1(filterBy = {}) {
-			// filterBy=user
-//     try {
-//         // const criteria = _buildCriteria(filterBy)
-//         const collection = await dbService.getCollection('stay')
-//         // const reviews = await collection.find(criteria).toArray()
-//         var reviews = await collection.aggregate([
-//             {
-//                 $match: filterBy
-//             },
-//             {
-//                 $lookup:
-//                 {
-//                     localField: 'byUserId',
-//                     from: 'user',
-//                     foreignField: '_id',
-//                     as: 'byUser'
-//                 }
-//             },
-//             {
-//                 $unwind: '$byUser'
-//             },
-//             {
-//                 $lookup:
-//                 {
-//                     localField: 'aboutUserId',
-//                     from: 'user',
-//                     foreignField: '_id',
-//                     as: 'aboutUser'
-//                 }
-//             },
-//             {
-//                 $unwind: '$aboutUser'
-//             }
-//         ]).toArray()
-//         reviews = reviews.map(review => {
-//             review.byUser = { _id: review.byUser._id, fullname: review.byUser.fullname }
-//             review.aboutUser = { _id: review.aboutUser._id, fullname: review.aboutUser.fullname }
-//             delete review.byUserId
-//             delete review.aboutUserId
-//             return review
-//         })
-
-//         return reviews
-//     } catch (err) {
-//         logger.error('cannot find reviews', err)
-//         throw err
-//     }
-
+// async function getByStayname(name) {
+// 	try {
+// 		const collection = await dbService.getCollection('stay');
+// 		const stay = await collection.findOne({ name });
+// 		return stay;
+// 	} catch (err) {
+// 		logger.error(`while finding stay ${toyname}`, err)
+// 		throw err;
+// 	}
 // }
 
 
+// async function getStaysByType(filterBy) {
+	// 	const { type, user } = filterBy
+	// 	var data = user
+	// 	var stays = []
+	// 	let criteria = {}
+	// 	console.log('$$$$$$$$$$$$$$',type, user);
+	// 	const collection = await dbService.getCollection('stay')
+	// 	switch (type) {
+	// 		case 'wishlist': {
+	// 			console.log('enter to wish');
+	// 			data = JSON.parse(data)
+	// 			console.log('data',data);
+	// 			var list = data.wishlist;
+	// 			var ids = [];
+	// 			list.forEach(function (item) {
+	// 				ids.push(new ObjectId(item));
+	// 			});
+	// 			criteria = { '_id': { $in: ids } }
+	// 			console.log('criteria',criteria);
+	// 			break
+	// 			// stays = await collection.find({ _id: { $in: ids } }).toArray();
+	// 		}
+	// 		case 'host': {
+	// 			const id = new ObjectId(data)
+	// 			criteria = { 'host._id': id }
+	// 			break
+	// 			//  stays = await collection.find({ 'host._id': id }).toArray();
+	// 			// return stays;
+	// 		}
+	// 		case 'top rated': {
 
+	// 		}
+	// 		case 'nearby': {
 
+	// 		}
+	// 	}
 
-
-
-
-
-
-
-
-
-
-// async function query(filterBy = { availability: 'all', searchTxt: '', type: 'all', sortBy: 'all' }) {
-//     const criteria = _buildCriteria({ ...filterBy })
-//     try {
-//         const collection = await dbService.getCollection('toy')
-//         var toys
-//         if (filterBy.sortBy) {
-//             switch (filterBy.sortBy) {
-//                 case 'price':
-//                      toys = await collection.find(criteria).sort({'price' : 1}).toArray()
-//                     break;
-//                 case 'name':
-//                      toys = await collection.find(criteria).sort({'name' : 1}).toArray()
-//                     break;
-//                 case 'all':
-//                      toys = await collection.find(criteria).toArray()
-//                     break;
-//                 default:
-//                     break;
-//             }
-//         }
-//         toys = toys.map(toy => {
-//             toy.createdAt = Date.now() - (1000 * 60 * 60 * 24 * 3) // 3 days ago
-//             // toy.createdAt = ObjectId(toy._id).getTimestamp()
-//             // Returning fake fresh data
-//             return toy
-//         })
-//         return toys
-//     } catch (err) {
-//         // logger.error('cannot find toys', err)
-//         throw err
-//     }
+	// 	try {
+	// 		stays = await collection.find(criteria).toArray();
+	// 	} catch (err) {
+	// 		logger.error('cannot find stays', err);
+	// 		throw err;
+	// 	}
+	// }
 // }
