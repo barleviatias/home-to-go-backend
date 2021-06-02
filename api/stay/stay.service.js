@@ -2,6 +2,7 @@ const dbService = require('../../services/db.service');
 // const logger = require('../../services/logger.service')
 // const reviewService = require('../review/review.service')
 const ObjectId = require('mongodb').ObjectId;
+const axios = require('axios');
 
 module.exports = {
 	query,
@@ -67,6 +68,7 @@ async function remove(stayId) {
 
 async function update(stay) {
 	try {
+		const cords=await getCords(stay)
 		// peek only updatable fields!
 		const stayToSave = {
 			_id: ObjectId(stay._id),
@@ -76,8 +78,8 @@ async function update(stay) {
 			desc: stay.desc,
 			capacity: stay.capacity,
 			favorites: stay.favorites,
-			host: stay.host,
-			loc: stay.loc,
+			host:{...stay.host ,_id:ObjectId(stay.host._id)},
+			loc:{...stay.loc,lat:cords.lat,lng:cords.lng},
 			propertyType: stay.propertyType,
 			stayType: stay.stayType,
 			reviews: stay.reviews,
@@ -94,9 +96,23 @@ async function update(stay) {
 		throw err;
 	}
 }
-
+async function getCords(stay){
+	try {
+		const address=stay.loc.address.replace(',',' ')
+		const response = await axios.get(`https://maps.googleapis.com/maps/api/geocode/json?address=${address}&key=AIzaSyAfvktGRnTPT-aq4CfjmM3zi1jWHxqojY4`)
+		console.log('res',response.data.results);
+		const geo=response.data.results
+		console.log('geo',geo);
+		console.log('cords',geo[0].geometry.location);
+		return geo[0].geometry.location
+	  } catch (error) {
+		console.error(error);
+	  }
+	// console.log('cords',cords.results[0].geometry.location);
+}
 async function add(stay) {
 	try {
+		const cords=await getCords(stay)
 		// peek only updatable fields!
 		const stayToAdd = {
 			name: stay.name,
@@ -106,7 +122,7 @@ async function add(stay) {
 			capacity: stay.capacity,
 			favorites: [],
 			host:{...stay.host ,_id:ObjectId(stay.host._id)} ,
-			loc: stay.loc,
+			loc:{...stay.loc,lat:cords.lat,lng:cords.lng},
 			propertyType: stay.propertyType,
 			stayType: stay.stayType,
 			reviews: [],
