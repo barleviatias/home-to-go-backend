@@ -52,7 +52,7 @@ async function remove(stayId) {
 
 async function update(stay) {
 	try {
-		const cords=await getCords(stay)
+		const cords = await getCords(stay)
 		// peek only updatable fields!
 		const stayToSave = {
 			_id: ObjectId(stay._id),
@@ -62,8 +62,8 @@ async function update(stay) {
 			desc: stay.desc,
 			capacity: stay.capacity,
 			favorites: stay.favorites,
-			host:{...stay.host ,_id:ObjectId(stay.host._id)},
-			loc:{...stay.loc,lat:cords.lat,lng:cords.lng},
+			host: { ...stay.host, _id: ObjectId(stay.host._id) },
+			loc: { ...stay.loc, lat: cords.lat, lng: cords.lng },
 			propertyType: stay.propertyType,
 			stayType: stay.stayType,
 			reviews: stay.reviews,
@@ -80,22 +80,22 @@ async function update(stay) {
 		throw err;
 	}
 }
-async function getCords(stay){
+async function getCords(stay) {
 	try {
-		const address=stay.loc.address.replace(',',' ')
+		const address = stay.loc.address.replace(',', ' ')
 		const response = await axios.get(`https://maps.googleapis.com/maps/api/geocode/json?address=${address}&key=AIzaSyAfvktGRnTPT-aq4CfjmM3zi1jWHxqojY4`)
-		console.log('res',response.data.results);
-		const geo=response.data.results
-		console.log('geo',geo);
-		console.log('cords',geo[0].geometry.location);
+		console.log('res', response.data.results);
+		const geo = response.data.results
+		console.log('geo', geo);
+		console.log('cords', geo[0].geometry.location);
 		return geo[0].geometry.location
-	  } catch (error) {
+	} catch (error) {
 		console.error(error);
-	  }
+	}
 }
 async function add(stay) {
 	try {
-		const cords=await getCords(stay)
+		const cords = await getCords(stay)
 		// peek only updatable fields!
 		const stayToAdd = {
 			name: stay.name,
@@ -104,8 +104,8 @@ async function add(stay) {
 			desc: stay.desc,
 			capacity: stay.capacity,
 			favorites: [],
-			host:{...stay.host ,_id:ObjectId(stay.host._id)} ,
-			loc:{...stay.loc,lat:cords.lat,lng:cords.lng},
+			host: { ...stay.host, _id: ObjectId(stay.host._id) },
+			loc: { ...stay.loc, lat: cords.lat, lng: cords.lng },
 			propertyType: stay.propertyType,
 			stayType: stay.stayType,
 			reviews: [],
@@ -169,7 +169,7 @@ async function getStaysByType(filterBy) {
 		var stays = await collection.find().toArray();
 		if (stays) {
 			if (filterBy.type === 'top rated') {
-				stays = stays.map((stay) => {
+				var stays = stays.map((stay) => {
 					stay.avgRate = _getRate(stay);
 					return stay;
 				});
@@ -192,11 +192,21 @@ async function getStaysByType(filterBy) {
 	}
 }
 
+// function _getRate(stay) {
+// 	const rates = stay.reviews.map((review) => review.avgRate);
+// 	const sum = rates.reduce((acc, rate) => {
+// 		acc += rate;
+// 		return acc;
+// 	}, 0);
+// 	return sum / rates.length;
+// }
+
 function _getRate(stay) {
 	const rates = stay.reviews.map((review) => review.avgRate);
 	const sum = rates.reduce((acc, rate) => {
 		acc += rate;
 		return acc;
 	}, 0);
-	return sum / rates.length;
-}
+	if (sum === 0) return 'new';
+	return (sum / rates.length).toFixed(1);
+};
