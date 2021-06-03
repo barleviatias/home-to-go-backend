@@ -1,6 +1,6 @@
 
 const dbService = require('../../services/db.service')
-const logger = require('../../services/logger.service')
+// const logger = require('../../services/logger.service')
 const reviewService = require('../review/review.service')
 const ObjectId = require('mongodb').ObjectId
 
@@ -26,7 +26,7 @@ async function query() {
         })
         return users
     } catch (err) {
-        logger.error('cannot find users', err)
+        // logger.error('cannot find users', err)
         throw err
     }
 }
@@ -36,18 +36,26 @@ async function getById(userId) {
         const collection = await dbService.getCollection('user')
         const user = await collection.findOne({ '_id': ObjectId(userId) })
         delete user.password
+        // ***********
+        // user.givenReviews = await reviewService.query({ userId: ObjectId(user._id) })
+        // user.givenReviews = user.givenReviews.map(review => {
+        //     delete review.user
+        //     return review
+        // })
+        // ***********
         return user
     } catch (err) {
-        logger.error(`while finding user ${userId}`, err)
+        // logger.error(`while finding user ${userId}`, err)
         throw err
     }
 }
 async function getByUsername(username) {
     try {
         const collection = await dbService.getCollection('user')
-        return await collection.findOne({ username })
+        const user = await collection.findOne({ username })
+        return user
     } catch (err) {
-        logger.error(`while finding user ${username}`, err)
+        // logger.error(`while finding user ${username}`, err)
         throw err
     }
 }
@@ -57,7 +65,7 @@ async function remove(userId) {
         const collection = await dbService.getCollection('user')
         await collection.deleteOne({ '_id': ObjectId(userId) })
     } catch (err) {
-        logger.error(`cannot remove user ${userId}`, err)
+        // logger.error(`cannot remove user ${userId}`, err)
         throw err
     }
 }
@@ -75,9 +83,10 @@ async function update(user) {
         }
         if (user.wishlist || user.wishlist.length === 0) userToSave.wishlist = user.wishlist;
         const collection = await dbService.getCollection('user')
-        return await collection.updateOne({ '_id': userToSave._id }, { $set: userToSave })
+        await collection.updateOne({ '_id': userToSave._id }, { $set: userToSave })
+        return userToSave;
     } catch (err) {
-        logger.error(`cannot update user ${user._id}`, err)
+        // logger.error(`cannot update user ${user._id}`, err)
         throw err
     }
 }
@@ -95,11 +104,13 @@ async function add(user) {
             wishlist:[]
         }
         const collection = await dbService.getCollection('user')
-        return await collection.insertOne(userToAdd)
+        await collection.insertOne(userToAdd)
+        return userToAdd
     } catch (err) {
-        logger.error('cannot insert user', err)
+        // logger.error('cannot insert user', err)
         throw err
     }
 }
+
 
 
