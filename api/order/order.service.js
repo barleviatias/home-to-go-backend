@@ -1,6 +1,7 @@
 const dbService = require('../../services/db.service')
 const ObjectId = require('mongodb').ObjectId
-const asyncLocalStorage = require('../../services/als.service')
+const logger = require('../../services/logger.service')
+// const asyncLocalStorage = require('../../services/als.service')
 
 async function query(user) {
     try {
@@ -11,7 +12,6 @@ async function query(user) {
         logger.error('cannot load orders', err)
         throw err
     }
-
 }
 
 function _buildCriteria({ id, type }) {
@@ -23,24 +23,16 @@ function _buildCriteria({ id, type }) {
 
 async function remove(orderId) {
     try {
-        // const store = asyncLocalStorage.getStore()
-        // const { userId, isAdmin } = store
         const collection = await dbService.getCollection('order')
-        // remove only if user is owner/admin
-        // const query = { _id: ObjectId(orderId) }
-        // if (!isAdmin) query.byUserId = ObjectId(userId)
         await collection.deleteOne({ _id: ObjectId(orderId) })
-        // return await collection.deleteOne({ _id: ObjectId(reviewId), byUserId: ObjectId(userId) })
     } catch (err) {
-        // logger.error(`cannot remove review ${reviewId}`, err)
+        logger.error(`cannot remove review ${reviewId}`, err)
         throw err
     }
 }
 
-
 async function add(order) {
     try {
-        // peek only updatable fields!
         const orderToAdd = {
             createdAt: Date.now(),
             host: order.host,
@@ -60,7 +52,6 @@ async function add(order) {
         throw err
     }
 }
-
 
 module.exports = {
     query,

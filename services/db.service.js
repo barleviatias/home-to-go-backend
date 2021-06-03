@@ -6,7 +6,6 @@ module.exports = {
     getCollection
 }
 
-// Database Name
 const dbName = 'home_DB'
 
 var dbConn = null
