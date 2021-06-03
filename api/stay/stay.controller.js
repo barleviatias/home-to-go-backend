@@ -15,11 +15,11 @@ async function getStays(req, res) {
 			else if (type === 'host') {
 				stays = await stayService.getHostStays(data);
 			}
-			else{
-				console.log('####### Enter to nearby / top #########');
+			else {
 				stays = await stayService.getStaysByType(req.query);
 			}
-			res.send(stays);;
+			res.send(stays);
+			return
 		} catch (err) {
 			logger.error('Failed to get wishe stays', err);
 			res.status(500).send({ err: 'Failed to get get WishStays stays' });
@@ -46,7 +46,6 @@ async function getStays(req, res) {
 		res.status(500).send({ err: 'Failed to get stays' });
 	}
 }
-
 
 async function getStay(req, res) {
 	try {
@@ -92,10 +91,6 @@ async function addStay(req, res) {
 	}
 }
 
-async function getTopStays(){
-
-}
-
 module.exports = {
 	getStay,
 	getStays,
@@ -104,20 +99,3 @@ module.exports = {
 	addStay,
 };
 
-// async function getStays(req, res) {
-//     const filterBy = {}
-//     const { searchTxt, availability, sortBy, type } = req.query
-
-//     try {
-//         filterBy.searchTxt = searchTxt || ''
-//         filterBy.availability = availability
-//         filterBy.sortBy = sortBy
-//         filterBy.type = type
-
-//         const toys = await toyService.query(filterBy)
-//         res.send(toys)
-//     } catch (err) {
-//         logger.error('Failed to get toys', err)
-//         res.status(500).send({ err: 'Failed to get toys' })
-//     }
-// }

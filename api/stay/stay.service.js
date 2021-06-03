@@ -92,7 +92,6 @@ async function getCords(stay){
 	  } catch (error) {
 		console.error(error);
 	  }
-	// console.log('cords',cords.results[0].geometry.location);
 }
 async function add(stay) {
 	try {
@@ -201,63 +200,3 @@ function _getRate(stay) {
 	}, 0);
 	return sum / rates.length;
 }
-
-
-
-// async function getByStayname(name) {
-// 	try {
-// 		const collection = await dbService.getCollection('stay');
-// 		const stay = await collection.findOne({ name });
-// 		return stay;
-// 	} catch (err) {
-// 		logger.error(`while finding stay ${toyname}`, err)
-// 		throw err;
-// 	}
-// }
-
-
-// async function getStaysByType(filterBy) {
-	// 	const { type, user } = filterBy
-	// 	var data = user
-	// 	var stays = []
-	// 	let criteria = {}
-	// 	console.log('$$$$$$$$$$$$$$',type, user);
-	// 	const collection = await dbService.getCollection('stay')
-	// 	switch (type) {
-	// 		case 'wishlist': {
-	// 			console.log('enter to wish');
-	// 			data = JSON.parse(data)
-	// 			console.log('data',data);
-	// 			var list = data.wishlist;
-	// 			var ids = [];
-	// 			list.forEach(function (item) {
-	// 				ids.push(new ObjectId(item));
-	// 			});
-	// 			criteria = { '_id': { $in: ids } }
-	// 			console.log('criteria',criteria);
-	// 			break
-	// 			// stays = await collection.find({ _id: { $in: ids } }).toArray();
-	// 		}
-	// 		case 'host': {
-	// 			const id = new ObjectId(data)
-	// 			criteria = { 'host._id': id }
-	// 			break
-	// 			//  stays = await collection.find({ 'host._id': id }).toArray();
-	// 			// return stays;
-	// 		}
-	// 		case 'top rated': {
-
-	// 		}
-	// 		case 'nearby': {
-
-	// 		}
-	// 	}
-
-	// 	try {
-	// 		stays = await collection.find(criteria).toArray();
-	// 	} catch (err) {
-	// 		logger.error('cannot find stays', err);
-	// 		throw err;
-	// 	}
-	// }
-// }

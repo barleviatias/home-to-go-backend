@@ -17,8 +17,6 @@ async function login(username, password) {
 
 async function signup(username, password, fullname, imgUrl, email) {
     const saltRounds = 10
-
-    console.log(username, password, fullname, imgUrl, email);
     // logger.debug(`auth.service - signup with username: ${username}, fullname: ${fullname}`)
     if (!username || !password || !fullname || !email) return Promise.reject('fullname, username and password are required!')
 

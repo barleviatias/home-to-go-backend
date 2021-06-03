@@ -30,12 +30,8 @@ app.use(session)
 const authRoutes = require('./api/auth/auth.routes')
 const userRoutes = require('./api/user/user.routes')
 const stayRoutes = require('./api/stay/stay.routes')
-// const reviewRoutes = require('./api/review/review.routes')
 const orderRoutes = require('./api/order/order.routes')
 const {connectSockets} = require('./services/socket.service')
-
-// const userRoutes = require('./api/user/user.routes')
-
 
 // routes
 const setupAsyncLocalStorage = require('./middlewares/setupAls.middleware')
@@ -51,7 +47,6 @@ app.get('/api/setup-session', (req, res) =>{
 app.use('/api/auth', authRoutes)
 app.use('/api/user', userRoutes)
 app.use('/api/stay', stayRoutes)
-// app.use('/api/review', reviewRoutes)
 app.use('/api/order', orderRoutes)
 connectSockets(http, session)
 
@@ -68,7 +63,7 @@ http.listen(port, () => {
     logger.info('Server is running on port: ' + port)
 })
 
-console.log('I am Here!, am I?')
+console.log('Server Run!')
 
 
 
