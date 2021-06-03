@@ -21,7 +21,6 @@ async function query() {
         users = users.map(user => {
             delete user.password
             user.createdAt = ObjectId(user._id).getTimestamp()
-            // Returning fake fresh data
             return user
         })
         return users
@@ -42,6 +41,7 @@ async function getById(userId) {
         throw err
     }
 }
+
 async function getByUsername(username) {
     try {
         const collection = await dbService.getCollection('user')
@@ -73,9 +73,19 @@ async function update(user) {
             isHost: user.isHost,
             imgUrl: user.imgUrl,
         }
+
         if (user.wishlist || user.wishlist.length === 0) userToSave.wishlist = user.wishlist;
+
         const collection = await dbService.getCollection('user')
-        return await collection.updateOne({ '_id': userToSave._id }, { $set: userToSave })
+        
+        console.log('userToSave: ' , userToSave);
+
+        await collection.updateOne({ '_id': userToSave._id }, { $set: userToSave })
+
+        console.log('userToSave: ' , userToSave);
+
+        return userToSave
+
     } catch (err) {
         logger.error(`cannot update user ${user._id}`, err)
         throw err
@@ -95,7 +105,11 @@ async function add(user) {
             wishlist:[]
         }
         const collection = await dbService.getCollection('user')
-        return await collection.insertOne(userToAdd)
+
+        await collection.insertOne(userToAdd)
+
+        return userToAdd
+
     } catch (err) {
         logger.error('cannot insert user', err)
         throw err

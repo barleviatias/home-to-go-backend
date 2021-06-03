@@ -35,7 +35,9 @@ async function deleteUser(req, res) {
 async function updateUser(req, res) {
     try {
         const user = req.body
+        // console.log('currUser: ' ,user);
         const savedUser = await userService.update(user)
+        // console.log('savedUser: ' ,savedUser);
         
         res.send(savedUser)
         // socketService.broadcast({ type: 'user-updated', data: review, to: savedUser._id })
