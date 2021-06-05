@@ -53,8 +53,29 @@ async function add(order) {
     }
 }
 
+async function update(order) {
+    try {
+        const orderToSave = {
+            ...order,
+            _id: ObjectId(order._id),
+            updadetAt: Date.now(),
+        };
+        const collection = await dbService.getCollection('order');
+        await collection.updateOne({ _id: orderToSave._id }, { $set: orderToSave });
+        return orderToSave;
+    } catch (err) {
+        logger.error(`cannot update order ${order._id}`, err)
+        throw err;
+    }
+}
+
+
+
+
+
 module.exports = {
     query,
     remove,
-    add
+    add,
+    update
 }

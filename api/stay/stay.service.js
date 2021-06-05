@@ -192,15 +192,6 @@ async function getStaysByType(filterBy) {
 	}
 }
 
-// function _getRate(stay) {
-// 	const rates = stay.reviews.map((review) => review.avgRate);
-// 	const sum = rates.reduce((acc, rate) => {
-// 		acc += rate;
-// 		return acc;
-// 	}, 0);
-// 	return sum / rates.length;
-// }
-
 function _getRate(stay) {
 	const rates = stay.reviews.map((review) => review.avgRate);
 	const sum = rates.reduce((acc, rate) => {
