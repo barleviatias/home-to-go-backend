@@ -71,6 +71,7 @@ async function remove(userId) {
 }
 
 async function update(user) {
+    
     try {
         console.log('user notifications' , user.notifications);
         // peek only updatable fields!
