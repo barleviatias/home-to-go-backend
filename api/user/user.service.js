@@ -80,6 +80,7 @@ async function update(user) {
             email: user.email,
             isHost: user.isHost,
             imgUrl: user.imgUrl,
+            notifications: user.notifications
         }
 
         if (user.wishlist || user.wishlist.length === 0) userToSave.wishlist = user.wishlist;

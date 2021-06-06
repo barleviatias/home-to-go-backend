@@ -32,9 +32,9 @@ function connectSockets(http, session) {
                 gSocketBySessionIdMap[socket.handshake.sessionID] = null
             }
         })
-        socket.on('book stay', msg => {
-            const { hostId, from, type } = msg
-            console.log('hostId', hostId);
+        socket.on('book stay', hostId => {
+            // const { hostId, from, type } = msg
+            // console.log('hostId', hostId);
             if (socket.hostId === hostId) return;
             if (socket.hostId) {
                 socket.leave(socket.hostId)
@@ -42,7 +42,6 @@ function connectSockets(http, session) {
             socket.join(hostId)
             // logger.debug('Session ID is', socket.handshake.sessionID)
             socket.hostId = hostId
-            gIo.to(socket.hostId).emit('notify host', from, type)
         })
         // socket.on('chat topic', topic => {
         //     console.log(topic);
@@ -54,12 +53,14 @@ function connectSockets(http, session) {
         //     // logger.debug('Session ID is', socket.handshake.sessionID)
         //     socket.myTopic = topic
         // })
-        socket.on('chat newMsg', msg => {
-            console.log('new msg!', msg);
+        socket.on('add notif', msg => {
+            console.log('add notif!', msg);
             // emits to all sockets:
             // gIo.emit('chat addMsg', msg)
             // emits only to sockets in the same room
-            gIo.to(socket.myTopic).emit('chat addMsg', msg)
+            // gIo.to(socket.myTopic).emit('chat addMsg', msg)
+            console.log('socket.hostId: ' , socket.hostId);
+            gIo.to(socket.hostId).emit('notify host', msg)
         })
         socket.on('user-watch', userId => {
             socket.join(userId)
