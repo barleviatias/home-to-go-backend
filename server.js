@@ -1,7 +1,6 @@
 const express = require('express')
 const cors = require('cors')
 const path = require('path')
-
 const expressSession = require('express-session')
 
 const app = express()
@@ -13,6 +12,7 @@ const session = expressSession({
     saveUninitialized: true,
     cookie: { secure: false }
 })
+
 // Express App Config
 app.use(express.json())
 app.use(session)
