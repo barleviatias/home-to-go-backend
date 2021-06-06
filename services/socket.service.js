@@ -20,14 +20,14 @@ function connectSockets(http, session) {
     }));
 
     gIo.on('connection', socket => {
-        console.log('New socket - socket.handshake.sessionID', socket.handshake.sessionID)
+        // console.log('New socket - socket.handshake.sessionID', socket.handshake.sessionID)
         gSocketBySessionIdMap[socket.handshake.sessionID] = socket
         // if (socket.handshake && socket.handshake.session && socket.handshake.session.user) {
         //     socket.join(socket.handshake.session.user._id)
         // }
 
         socket.on('disconnect', socket => {
-            console.log('Someone disconnected')
+            // console.log('Someone disconnected')
             if (socket.handshake) {
                 gSocketBySessionIdMap[socket.handshake.sessionID] = null
             }
@@ -54,12 +54,12 @@ function connectSockets(http, session) {
         //     socket.myTopic = topic
         // })
         socket.on('add notif', msg => {
-            console.log('add notif!', msg);
+            // console.log('add notif!', msg);
             // emits to all sockets:
             // gIo.emit('chat addMsg', msg)
             // emits only to sockets in the same room
             // gIo.to(socket.myTopic).emit('chat addMsg', msg)
-            console.log('socket.hostId: ' , socket.hostId);
+            // console.log('socket.hostId: ' , socket.hostId);
             gIo.to(socket.hostId).emit('notify host', msg)
         })
         socket.on('user-watch', userId => {

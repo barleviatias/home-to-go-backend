@@ -176,14 +176,14 @@ async function getStaysByType(filterBy) {
 				stays.sort(function (a, b) {
 					return b.avgRate - a.avgRate;
 				});
-				return stays.slice(0, 4);
+				return stays.slice(0, 8);
 			}
 			else if (filterBy.type === 'nearby') {
 				const { data } = filterBy
 				stays = stays.filter((stay) => {
 					return stay.loc.address.toUpperCase().includes(data.toUpperCase());
 				});
-				return stays.slice(0, 4);
+				return stays.slice(0, 8);
 			}
 		}
 	} catch (err) {
