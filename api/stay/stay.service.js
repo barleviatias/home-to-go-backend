@@ -84,10 +84,7 @@ async function getCords(stay) {
 	try {
 		const address = stay.loc.address.replace(',', ' ')
 		const response = await axios.get(`https://maps.googleapis.com/maps/api/geocode/json?address=${address}&key=AIzaSyAfvktGRnTPT-aq4CfjmM3zi1jWHxqojY4`)
-		console.log('res', response.data.results);
 		const geo = response.data.results
-		console.log('geo', geo);
-		console.log('cords', geo[0].geometry.location);
 		return geo[0].geometry.location
 	} catch (error) {
 		console.error(error);
