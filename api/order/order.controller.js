@@ -49,15 +49,11 @@ async function updateOrder(req, res) {
         const order = req.body;
         const updatedOrder = await orderService.update(order);
         res.send(updatedOrder);
-        // socketService.broadcast({ type: 'stayy-updated', data: stay, to: updatedToy._id })
     } catch (err) {
         logger.error('Failed to update order', err);
         res.status(500).send({ err: 'Failed to update order' });
     }
 }
-
-
-
 
 module.exports = {
     getOrders,
