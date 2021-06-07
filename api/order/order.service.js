@@ -1,6 +1,6 @@
 const dbService = require('../../services/db.service')
-const ObjectId = require('mongodb').ObjectId
 const logger = require('../../services/logger.service')
+const ObjectId = require('mongodb').ObjectId
 // const asyncLocalStorage = require('../../services/als.service')
 
 async function query(user) {
@@ -42,7 +42,7 @@ async function add(order) {
             endDate: order.endDate,
             guests: order.guests,
             stay: order.stay,
-            status: "wait for approval"
+            status: order.status
         }
         const collection = await dbService.getCollection('order')
         await collection.insertOne(orderToAdd)
@@ -68,10 +68,6 @@ async function update(order) {
         throw err;
     }
 }
-
-
-
-
 
 module.exports = {
     query,
