@@ -1,7 +1,5 @@
 const logger = require('../../services/logger.service')
 const orderService = require('../order/order.service')
-// const userService = require('../user/user.service')
-// const socketService = require('../../services/socket.service')
 
 async function getOrders(req, res) {
     try {
@@ -61,13 +59,4 @@ module.exports = {
     deleteOrder,
     addOrder,
     updateOrder
-}
-
-{
-    // prepare the updated order for sending out
-    // order.user = await userService.getById(order.userId)
-    // order.toy = await orderService.getById(order.orderId)
-    // console.log('CTRL SessionId:', req.sessionID);
-    // socketService.broadcast({type: 'order-added', data: order})
-    // socketService.emitToAll({type: 'user-updated', data: order.user, room: req.session.user._id})
 }
