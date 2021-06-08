@@ -82,11 +82,10 @@ async function update(user) {
             email: user.email,
             isHost: user.isHost,
             imgUrl: user.imgUrl,
-            notifications: user.notifications
+            notifications: (user.notifications) ? user.notifications : []
         }
 
         if (user.wishlist || user.wishlist.length === 0) userToSave.wishlist = user.wishlist;
-
         const collection = await dbService.getCollection('user')
 
         await collection.updateOne({ '_id': userToSave._id }, { $set: userToSave })

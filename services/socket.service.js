@@ -5,6 +5,7 @@ const logger = require('./logger.service');
 
 var gIo = null
 var gSocketBySessionIdMap = {}
+var gSocketByUserIdMap = {}
 
 function connectSockets(http, session) {
     gIo = require('socket.io')(http, {
@@ -20,47 +21,27 @@ function connectSockets(http, session) {
     }));
 
     gIo.on('connection', socket => {
-        // console.log('New socket - socket.handshake.sessionID', socket.handshake.sessionID)
         gSocketBySessionIdMap[socket.handshake.sessionID] = socket
-        // if (socket.handshake && socket.handshake.session && socket.handshake.session.user) {
-        //     socket.join(socket.handshake.session.user._id)
-        // }
-
         socket.on('disconnect', socket => {
-            // console.log('Someone disconnected')
+            console.log('Someone disconnected')
             if (socket.handshake) {
-                gSocketBySessionIdMap[socket.handshake.sessionID] = null
+                delete gSocketBySessionIdMap[socket.handshake.sessionID]
             }
         })
-        socket.on('book stay', hostId => {
-            // const { hostId, from, type } = msg
-            // console.log('hostId', hostId);
-            if (socket.hostId === hostId) return;
-            if (socket.hostId) {
-                socket.leave(socket.hostId)
-            }
-            socket.join(hostId)
-            // logger.debug('Session ID is', socket.handshake.sessionID)
-            socket.hostId = hostId
+
+        socket.on('LOGIN', user => {
+            gSocketByUserIdMap[user._id] = socket
         })
-        // socket.on('chat topic', topic => {
-        //     console.log(topic);
-        //     if (socket.myTopic === topic) return;
-        //     if (socket.myTopic) {
-        //         socket.leave(socket.myTopic)
-        //     }
-        //     socket.join(topic)
-        //     // logger.debug('Session ID is', socket.handshake.sessionID)
-        //     socket.myTopic = topic
-        // })
-        socket.on('add notif', msg => {
-            // console.log('add notif!', msg);
-            // emits to all sockets:
-            // gIo.emit('chat addMsg', msg)
-            // emits only to sockets in the same room
-            // gIo.to(socket.myTopic).emit('chat addMsg', msg)
-            // console.log('socket.hostId: ' , socket.hostId);
-            gIo.to(socket.hostId).emit('notify host', msg)
+
+        socket.on('ORDER_OUT', order => {
+            const hostSocket = gSocketByUserIdMap[order.host._id]
+            const userSocket = gSocketByUserIdMap[order.user._id]
+            if (hostSocket) hostSocket.emit('ORDER_IN', order)
+            if (userSocket) userSocket.emit('ORDER_IN', order)
+        })
+
+        socket.on('set notif', msg => {
+            gIo.to(socket.handshake.session.user._id).emit('get notif', msg)
         })
         socket.on('user-watch', userId => {
             socket.join(userId)
@@ -74,13 +55,10 @@ function emitToAll({ type, data, room = null }) {
     else gIo.emit(type, data)
 }
 
-// TODO: Need to test emitToUser feature
 function emitToUser({ type, data, userId }) {
     gIo.to(userId).emit(type, data)
 }
 
-
-// Send to all sockets BUT not the current socket 
 function broadcast({ type, data, room = null }) {
     const store = asyncLocalStorage.getStore()
     const { sessionId } = store
