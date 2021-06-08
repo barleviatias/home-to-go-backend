@@ -3,7 +3,6 @@ const logger = require('../../services/logger.service')
 
 async function login(req, res) {
     const { username, password } = req.body
-    // console.log(username,password);
     try {
         const user = await authService.login(username, password)
         req.session.user = user
@@ -14,15 +13,10 @@ async function login(req, res) {
     }
 }
 
-
 async function signup(req, res) {
     try {
-        const { username, password, fullname,imgUrl,email} = req.body
-        // Never log passwords
-        // logger.debug(fullname + ', ' + username + ', ' + password)
-        
-        const account = await authService.signup(username, password, fullname,imgUrl,email )
-        // logger.debug(`auth.route - new account created: ` + JSON.stringify(account))
+        const { username, password, fullname, imgUrl, email } = req.body
+        const account = await authService.signup(username, password, fullname, imgUrl, email)
         const user = await authService.login(username, password)
         req.session.user = user
         res.json(user)
@@ -32,7 +26,7 @@ async function signup(req, res) {
     }
 }
 
-async function logout(req, res){
+async function logout(req, res) {
     try {
         req.session.destroy()
         res.send({ msg: 'Logged out successfully' })

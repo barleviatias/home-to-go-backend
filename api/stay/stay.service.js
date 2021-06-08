@@ -1,13 +1,11 @@
 const dbService = require('../../services/db.service');
 const logger = require('../../services/logger.service')
-// const reviewService = require('../review/review.service')
 const ObjectId = require('mongodb').ObjectId;
 const axios = require('axios');
 
 module.exports = {
 	query,
 	getById,
-	// getByStayname,
 	getStaysByType,
 	remove,
 	update,
@@ -17,7 +15,6 @@ module.exports = {
 };
 
 async function query(filterBy = { address: '', guests: 1, type: '' }) {
-
 	const criteria = _buildCriteria({ ...filterBy });
 	try {
 		const collection = await dbService.getCollection('stay');
@@ -53,7 +50,6 @@ async function remove(stayId) {
 async function update(stay) {
 	try {
 		const cords = await getCords(stay)
-		// peek only updatable fields!
 		const stayToSave = {
 			_id: ObjectId(stay._id),
 			name: stay.name,
@@ -80,6 +76,7 @@ async function update(stay) {
 		throw err;
 	}
 }
+
 async function getCords(stay) {
 	try {
 		const address = stay.loc.address.replace(',', ' ')
@@ -96,7 +93,6 @@ async function getCords(stay) {
 async function add(stay) {
 	try {
 		const cords = await getCords(stay)
-		// peek only updatable fields!
 		const stayToAdd = {
 			name: stay.name,
 			imgUrls: stay.imgUrls,

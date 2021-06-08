@@ -1,5 +1,4 @@
 const userService = require('./user.service')
-const socketService = require('../../services/socket.service')
 const logger = require('../../services/logger.service')
 
 async function getUser(req, res) {
@@ -35,7 +34,7 @@ async function deleteUser(req, res) {
 async function updateUser(req, res) {
     try {
         const user = req.body
-        const savedUser = await userService.update(user)  
+        const savedUser = await userService.update(user)
         res.send(savedUser)
 
     } catch (err) {
