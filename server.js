@@ -46,13 +46,15 @@ app.use('/api/stay', stayRoutes)
 app.use('/api/order', orderRoutes)
 connectSockets(http, session)
 
+app.use(express.static('public'));
+
 app.get('/**', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'))
 })
 
 const logger = require('./services/logger.service')
 const port = process.env.PORT || 3030
-http.listen(port, () => {
+app.listen(port, () => {
     logger.info('Server is running on port: ' + port)
 })
 
